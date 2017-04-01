@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+
+  <h1>Chat</h1>
+
+  <form id="add">
+    Name: <input name="name" placeholder="Name"><br>
+    Message: <input name="message" placeholder=""><br>
+    <button>Send</button>
+  </form>
+
+  <ul id="chat"></ul>
+
+<script src="lib/jquery/jquery.js"></script>
+<script>
+  update();
+  //setInterval(update, 1000);
+
+  $('button').click(function() {
+    var data = JSON.stringify({
+      name:    $('input[name=name]').val(),
+      message: $('input[name=message]').val()
+    });
+
+    fetch('/chat', {
+      method: 'POST',
+      headers: new Headers({
+        "Content-Type": 'application/json'
+      }),
+      body: data
+    }).then(function(res) {
+      return res.json();
+    }).then(function(post) {
+      console.log(post);
+    });
+    $('input[name=message]').val('');
+    update();
+    return false;
+  });
+
+
+  function update() {
+    fetch('/chat').then(function(res) {
+      return res.json();
+    }).then(function(posts) {
+
+      console.log(posts);
+
+      var $chat = $('#chat');
+      $chat.empty();
+      posts.forEach(function(post) {
+        $chat.append(
+          $('<li>').text(post.name).append(
+            $('<pre>').text(post.message)
+          )
+        )
+      })
+
+    }).catch(function(err) {
+      console.error(err);
+    });
+  }
+
+
+
+</script>
+
+</body>
+</html>
